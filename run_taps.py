@@ -1,7 +1,7 @@
 import json
 from services.airtable_api import Airtable
 
-with open('./services/program_base.json', 'r') as f:
+with open('./config.json', 'r') as f:
     config = json.load(f)
     base_id = config["base_id"]
 

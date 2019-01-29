@@ -6,7 +6,7 @@ import singer
 
 
 class Airtable(object):
-    with open('./services/program_base.json', 'r') as f:
+    with open('./config.json', 'r') as f:
         config = json.load(f)
         metadata_url = config["metadata_url"]
         records_url = config["records_url"]
