@@ -35,7 +35,18 @@ pip install -e .
  pip install target-postgres
 ```
 
-### To run full tap and target action run for Program Base 2018 and Program Base 2019
+### To run full tap and target action run for a particular Base
+
+Complete the config.json 
+
+```
+{
+    "metadata_url":"https://api.airtable.com/v2/meta/",
+    "records_url":"https://api.airtable.com/v0/",
+    "token":"airtable-api-key",
+    "base_id": "base-id"
+}
+```
 
 From the home directory of the project 
 
