@@ -22,7 +22,7 @@ setup(name='tap-airtable',
           'singer-python==5.4.0',
           'six==1.11.0',
           'tzlocal==1.5.1',
-          'urllib3==1.24.1'
+          'urllib3==1.24.2'
       ],
       entry_points='''
           [console_scripts]
