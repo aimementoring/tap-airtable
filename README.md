@@ -51,5 +51,5 @@ Complete the config.json
 From the home directory of the project 
 
 ```shell
-python3 run_taps.py | ~/.virtualenvs/target-postgres/bin/target-postgres --config db_schema.json
+python3 run_taps.py | ~/.virtualenvs/target-postgres/bin/target-postgres --config config.json
 ```
