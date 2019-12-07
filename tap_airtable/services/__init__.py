@@ -1,5 +1,4 @@
-from services.fields_mapping import FieldsMapping
-from utils.json_utils import JsonUtils, Relations
+from tap_airtable.utils import JsonUtils, Relations
 import requests
 import json
 import singer
@@ -28,7 +27,7 @@ class Airtable(object):
 
             for field in table["fields"]:
                 if not field["name"] == "Id":
-                    columns[field["name"]] = {"type": ["null", FieldsMapping.map_field(field["config"])]}
+                    columns[field["name"]] = {"type": ["null", "string"]}
 
             schemas.append(schema)
 
