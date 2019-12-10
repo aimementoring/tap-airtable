@@ -1,6 +1,6 @@
 {
     "metadata_url":"https://api.airtable.com/v2/meta/",
     "records_url":"https://api.airtable.com/v0/",
-    "token":"keyQwkepkcSrWl1du",
-    "base_id": "app8rk2s78x7ZjQeo"
+    "token":"token",
+    "base_id": "base_id"
 }
