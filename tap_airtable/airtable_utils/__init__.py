@@ -1,4 +1,3 @@
-from tap_airtable.utils.relations_records import Relations
 import random
 import string
 

@@ -29,10 +29,5 @@ setup(name='tap-airtable',
           tap-airtable=tap_airtable:main
       ''',
       packages=['tap_airtable'],
-      # package_data = {
-      #     'tap_salesforce/schemas': [
-      #         # add schema.json filenames here
-      #     ]
-      # },
       include_package_data=True,
       )

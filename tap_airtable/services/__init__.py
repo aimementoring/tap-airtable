@@ -1,7 +1,8 @@
-from tap_airtable.utils import JsonUtils, Relations
+from tap_airtable.airtable_utils import JsonUtils, Relations
 import requests
 import json
 import singer
+from tap_airtable.services.catalog import Catalog, CatalogEntry
 
 
 class Airtable(object):
@@ -12,15 +13,15 @@ class Airtable(object):
         token = config["token"]
 
     @classmethod
-    def run_discovery(cls, base_id):
-        headers = {'Authorization': 'Bearer {}'.format(cls.token)}
-        response = requests.get(url=cls.metadata_url + base_id, headers=headers)
+    def run_discovery(cls, args):
+        headers = {'Authorization': 'Bearer {}'.format(args.config['token'])}
+        response = requests.get(url=args.config['metadata_url'] + args.config['base_id'], headers=headers)
         schemas = []
 
         for table in response.json()["tables"]:
 
             columns = {}
-            schema = {"name": table["name"],
+            base = {"name": table["name"],
                       "properties": columns}
 
             columns["id"] = {"type": ["null", "string"], 'key': True}
@@ -29,10 +30,10 @@ class Airtable(object):
                 if not field["name"] == "Id":
                     columns[field["name"]] = {"type": ["null", "string"]}
 
+            schema = CatalogEntry(base)
             schemas.append(schema)
 
-        with open('./services/{}_schemas.json'.format(base_id), 'w') as outfile:
-            json.dump(schemas, outfile)
+        return Catalog(schemas).dump()
 
     @classmethod
     def run_tap(cls, base_id):
