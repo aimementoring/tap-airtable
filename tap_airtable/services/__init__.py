@@ -2,8 +2,7 @@ from tap_airtable.airtable_utils import JsonUtils, Relations
 import requests
 import json
 import singer
-from tap_airtable.services.catalog import Catalog, CatalogEntry
-
+from singer.catalog import Catalog, CatalogEntry
 
 class Airtable(object):
     with open('./config.json', 'r') as f:
@@ -16,12 +15,13 @@ class Airtable(object):
     def run_discovery(cls, args):
         headers = {'Authorization': 'Bearer {}'.format(args.config['token'])}
         response = requests.get(url=args.config['metadata_url'] + args.config['base_id'], headers=headers)
-        schemas = []
+        entries = []
 
         for table in response.json()["tables"]:
 
             columns = {}
-            base = {"name": table["name"],
+            table_name = table["name"]
+            base = {"name": table_name,
                       "properties": columns}
 
             columns["id"] = {"type": ["null", "string"], 'key': True}
@@ -30,10 +30,13 @@ class Airtable(object):
                 if not field["name"] == "Id":
                     columns[field["name"]] = {"type": ["null", "string"]}
 
-            schema = CatalogEntry(base)
-            schemas.append(schema)
+            entry = CatalogEntry(
+                table=table_name,
+                stream=table_name,
+                metadata=base)
+            entries.append(entry)
 
-        return Catalog(schemas).dump()
+        return Catalog(entries).dump()
 
     @classmethod
     def run_tap(cls, base_id):
