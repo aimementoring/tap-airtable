@@ -15,8 +15,9 @@ database.
 ### Install
 
 ```bash
-$ mkvirtualenv -p python3 tap-airtable
-$ pip install tap-mysql
+python3 -m venv ~/.virtualenvs/tap-airtable
+source ~/.virtualenvs/tap-airtable/bin/activate
+pip install -e .
 ```
 
 
