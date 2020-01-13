@@ -4,6 +4,7 @@ import json
 import singer
 from singer.catalog import Catalog, CatalogEntry
 
+
 class Airtable(object):
     with open('./config.json', 'r') as f:
         config = json.load(f)
@@ -39,17 +40,17 @@ class Airtable(object):
         return Catalog(entries).dump()
 
     @classmethod
-    def run_tap(cls, base_id):
+    def run_sync(cls, config, properties):
 
-        with open('./services/{}_schemas.json'.format(base_id), 'r') as f:
-            schemas = json.load(f)
+        streams = properties['streams']
 
-        for schema in schemas:
-            table = schema["name"].replace('/', '')
+        for stream in streams:
+            table = stream['table_name'].replace('/', '')
             table = table.replace(' ', '')
+            schema = stream['metadata']
 
             if table != 'relations':
-                response = Airtable.get_response(base_id, schema["name"])
+                response = Airtable.get_response(config['base_id'], schema["name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
                                                                response.json().get('records'))
@@ -60,7 +61,7 @@ class Airtable(object):
                 offset = response.json().get("offset")
 
                 while offset:
-                    response = Airtable.get_response(base_id, schema["name"], offset)
+                    response = Airtable.get_response(config['base_id'], schema["name"], offset)
                     if response.json().get('records'):
                         records = JsonUtils.match_record_with_keys(schema,
                                                                    response.json().get('records'))

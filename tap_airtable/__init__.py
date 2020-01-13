@@ -1,6 +1,6 @@
-import json
 from singer import utils
 from tap_airtable.services import Airtable
+
 
 REQUIRED_CONFIG_KEYS = [
     'metadata_url',
@@ -15,8 +15,8 @@ def main():
 
     if args.discover:
         Airtable.run_discovery(args)
-
-    #Airtable.run_tap(base_id)
+    elif args.properties:
+        Airtable.run_sync(args.config, args.properties)
 
 
 if __name__ == "__main__":
