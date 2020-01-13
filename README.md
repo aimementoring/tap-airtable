@@ -83,5 +83,5 @@ Complete the config.json
 From the home directory of the project 
 
 ```shell
-python3 run_taps.py | ~/.virtualenvs/target-postgres/bin/target-postgres --config config.json
+tap-airtable -c config.json --properties properties.json | ~/.virtualenvs/target-postgres/bin/target-postgres 
 ```
