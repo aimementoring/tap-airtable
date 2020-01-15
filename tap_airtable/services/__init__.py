@@ -1,8 +1,8 @@
-from services.fields_mapping import FieldsMapping
-from utils.json_utils import JsonUtils, Relations
+from tap_airtable.airtable_utils import JsonUtils, Relations
 import requests
 import json
 import singer
+from singer.catalog import Catalog, CatalogEntry
 
 
 class Airtable(object):
@@ -13,40 +13,44 @@ class Airtable(object):
         token = config["token"]
 
     @classmethod
-    def run_discovery(cls, base_id):
-        headers = {'Authorization': 'Bearer {}'.format(cls.token)}
-        response = requests.get(url=cls.metadata_url + base_id, headers=headers)
-        schemas = []
+    def run_discovery(cls, args):
+        headers = {'Authorization': 'Bearer {}'.format(args.config['token'])}
+        response = requests.get(url=args.config['metadata_url'] + args.config['base_id'], headers=headers)
+        entries = []
 
         for table in response.json()["tables"]:
 
             columns = {}
-            schema = {"name": table["name"],
+            table_name = table["name"]
+            base = {"name": table_name,
                       "properties": columns}
 
             columns["id"] = {"type": ["null", "string"], 'key': True}
 
             for field in table["fields"]:
                 if not field["name"] == "Id":
-                    columns[field["name"]] = {"type": ["null", FieldsMapping.map_field(field["config"])]}
+                    columns[field["name"]] = {"type": ["null", "string"]}
 
-            schemas.append(schema)
+            entry = CatalogEntry(
+                table=table_name,
+                stream=table_name,
+                metadata=base)
+            entries.append(entry)
 
-        with open('./services/{}_schemas.json'.format(base_id), 'w') as outfile:
-            json.dump(schemas, outfile)
+        return Catalog(entries).dump()
 
     @classmethod
-    def run_tap(cls, base_id):
+    def run_sync(cls, config, properties):
 
-        with open('./services/{}_schemas.json'.format(base_id), 'r') as f:
-            schemas = json.load(f)
+        streams = properties['streams']
 
-        for schema in schemas:
-            table = schema["name"].replace('/', '')
+        for stream in streams:
+            table = stream['table_name'].replace('/', '')
             table = table.replace(' ', '')
+            schema = stream['metadata']
 
             if table != 'relations':
-                response = Airtable.get_response(base_id, schema["name"])
+                response = Airtable.get_response(config['base_id'], schema["name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
                                                                response.json().get('records'))
@@ -57,7 +61,7 @@ class Airtable(object):
                 offset = response.json().get("offset")
 
                 while offset:
-                    response = Airtable.get_response(base_id, schema["name"], offset)
+                    response = Airtable.get_response(config['base_id'], schema["name"], offset)
                     if response.json().get('records'):
                         records = JsonUtils.match_record_with_keys(schema,
                                                                    response.json().get('records'))

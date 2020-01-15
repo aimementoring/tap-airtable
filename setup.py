@@ -1,12 +1,12 @@
 from setuptools import setup
 
 setup(name='tap-airtable',
-      version='0.0.1',
+      version='0.0.2',
       description='Singer.io tap for extracting data from the Airtable API',
       author='AIME Mentorinng',
       url='https://singer.io',
       classifiers=['Programming Language :: Python :: 3 :: Only'],
-      py_modules=['services', 'utils'],
+      py_modules=['tap_airtable'],
       install_requires=[
           'backoff==1.3.2',
           'certifi==2018.11.29',
@@ -26,13 +26,8 @@ setup(name='tap-airtable',
       ],
       entry_points='''
           [console_scripts]
-          tap_airtable=run_taps.py
+          tap-airtable=tap_airtable:main
       ''',
-      # packages=['tap_airtable', 'run_taps.py'],
-      # package_data = {
-      #     'tap_salesforce/schemas': [
-      #         # add schema.json filenames here
-      #     ]
-      # },
+      packages=['tap_airtable'],
       include_package_data=True,
       )
