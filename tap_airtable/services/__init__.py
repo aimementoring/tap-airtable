@@ -50,7 +50,7 @@ class Airtable(object):
             table = table.replace(' ', '')
             schema = stream['metadata']
 
-            if table != 'relations':
+            if table != 'relations' and schema['selected']:
                 response = Airtable.get_response(config['base_id'], schema["name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
