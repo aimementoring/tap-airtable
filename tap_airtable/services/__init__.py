@@ -22,8 +22,9 @@ class Airtable(object):
 
             columns = {}
             table_name = table["name"]
-            base = {"name": table_name,
-                      "properties": columns}
+            base = {"selected": args.config['selected_by_default'],
+                    "name": table_name,
+                    "properties": columns}
 
             columns["id"] = {"type": ["null", "string"], 'key': True}
 
