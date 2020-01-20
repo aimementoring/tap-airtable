@@ -3,5 +3,6 @@
     "records_url":"https://api.airtable.com/v0/",
     "token":"airtable-api-key",
     "base_id": "base-id",
-    "selected_by_default": true
+    "selected_by_default": false,
+    "remove_emojis": false
 }
