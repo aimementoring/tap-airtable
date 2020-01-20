@@ -23,7 +23,19 @@ pip install -e .
 
 ### Create the configuration file
 
-Create a config file containing the database connection credentials, e.g.:
+
+| Configuration Key   | Description                                                                                              |
+|---------------------|----------------------------------------------------------------------------------------------------------|
+| metadata_url        | Airtable metadata URL, at the time of the update: "https://api.airtable.com/v2/meta/"                    |
+| records_url         | Airtable content URL, at the time of the update: "https://api.airtable.com/v0/"                          |
+| token               | Airtable Token                                                                                           |
+| base_id             | Airtable base ID to export                                                                               |
+| selected_by_default | Default for every table in the base. If set to true, all of the tables in the schema will be syncronized |
+| remove_emojis       | Filter out emojis from the scyncronization                                                               |
+
+
+#### Configuration file example
+
 
 ```json
 {
@@ -31,7 +43,8 @@ Create a config file containing the database connection credentials, e.g.:
     "records_url":"https://api.airtable.com/v0/",
     "token":"airtable_token",
     "base_id": "airtable_base_id",
-    "selected_by_default": true
+    "selected_by_default": true,
+    "remove_emojis": false
 }
 ```
 
