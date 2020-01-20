@@ -1,11 +1,25 @@
 import random
 import string
+import re
 
 
 class JsonUtils(object):
 
     @classmethod
-    def match_record_with_keys(cls, schema, records):
+    def remove_emojis(cls, record):
+        emoji_pattern = re.compile("["
+                                   u"\U0001F600-\U0001F64F"  # emoticons
+                                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                                   u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                                   u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                                   u"\U00002702-\U000027B0"
+                                   u"\U000024C2-\U0001F251"
+                                   "]+", flags=re.UNICODE)
+
+        return emoji_pattern.sub(r'', record)
+
+    @classmethod
+    def match_record_with_keys(cls, schema, records, remove_emojis):
 
         records_to_dump = []
 
@@ -22,9 +36,15 @@ class JsonUtils(object):
                 else:
                     if schema['properties'][key]['type'] == ["null", "string"] \
                             or schema['properties'][key]['type'] == ["null", "number"]:
-                        record_to_dump[key] = str(record.get('fields').get(key))
+                        if remove_emojis:
+                            record_to_dump[key] = JsonUtils.remove_emojis(str(record.get('fields').get(key)))
+                        else:
+                            record_to_dump[key] = str(record.get('fields').get(key))
                     else:
-                        record_to_dump[key] = record.get('fields').get(key)
+                        if remove_emojis:
+                            record_to_dump[key] = JsonUtils.remove_emojis(record.get('fields').get(key))
+                        else:
+                            record_to_dump[key] = record.get('fields').get(key)
 
                 Relations.save_if_list_of_ids(record.get('fields').get(key), id)
 

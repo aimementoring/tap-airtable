@@ -54,7 +54,8 @@ class Airtable(object):
                 response = Airtable.get_response(config['base_id'], schema["name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
-                                                               response.json().get('records'))
+                                                               response.json().get('records'),
+                                                               config['remove_emojis'])
 
                 singer.write_schema(table, schema, 'id')
                 singer.write_records(table, records)
@@ -65,7 +66,8 @@ class Airtable(object):
                     response = Airtable.get_response(config['base_id'], schema["name"], offset)
                     if response.json().get('records'):
                         records = JsonUtils.match_record_with_keys(schema,
-                                                                   response.json().get('records'))
+                                                                   response.json().get('records'),
+                                                                   config['remove_emojis'])
 
                     singer.write_records(table, records)
                     offset = response.json().get("offset")
