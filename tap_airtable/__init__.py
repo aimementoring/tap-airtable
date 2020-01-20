@@ -6,7 +6,8 @@ REQUIRED_CONFIG_KEYS = [
     'metadata_url',
     'records_url',
     'token',
-    'base_id'
+    'base_id',
+    'selected_by_default'
 ]
 
 
