@@ -7,7 +7,8 @@ REQUIRED_CONFIG_KEYS = [
     'records_url',
     'token',
     'base_id',
-    'selected_by_default'
+    'selected_by_default',
+    'remove_emojis'
 ]
 
 
