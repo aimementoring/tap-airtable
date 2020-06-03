@@ -48,6 +48,8 @@ class Airtable(object):
         for stream in streams:
             table = stream['table_name'].replace('/', '')
             table = table.replace(' ', '')
+            table = table.replace('{', '')
+            table = table.replace('}', '')
             schema = stream['metadata']
 
             if table != 'relations' and schema['selected']:
@@ -57,20 +59,20 @@ class Airtable(object):
                                                                response.json().get('records'),
                                                                config['remove_emojis'])
 
-                singer.write_schema(table, schema, 'id')
-                singer.write_records(table, records)
-
-                offset = response.json().get("offset")
-
-                while offset:
-                    response = Airtable.get_response(config['base_id'], schema["name"], offset)
-                    if response.json().get('records'):
-                        records = JsonUtils.match_record_with_keys(schema,
-                                                                   response.json().get('records'),
-                                                                   config['remove_emojis'])
-
+                    singer.write_schema(table, schema, 'id')
                     singer.write_records(table, records)
+
                     offset = response.json().get("offset")
+
+                    while offset:
+                        response = Airtable.get_response(config['base_id'], schema["name"], offset)
+                        if response.json().get('records'):
+                            records = JsonUtils.match_record_with_keys(schema,
+                                                                       response.json().get('records'),
+                                                                       config['remove_emojis'])
+
+                        singer.write_records(table, records)
+                        offset = response.json().get("offset")
 
         relations_table = {"name": "relations",
                            "properties": {"id": {"type": ["null", "string"]},
