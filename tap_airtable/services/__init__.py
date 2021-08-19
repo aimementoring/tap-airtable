@@ -1,19 +1,18 @@
 from tap_airtable.airtable_utils import JsonUtils, Relations
 import requests
-import json
 import singer
 from singer.catalog import Catalog, CatalogEntry
 
 
-class Airtable(object):
-    with open('./config.json', 'r') as f:
-        config = json.load(f)
-        metadata_url = config["metadata_url"]
-        records_url = config["records_url"]
-        token = config["token"]
+class Airtable():
 
-    @classmethod
-    def run_discovery(cls, args):
+    def __init__(self, config):
+        self.config = config
+        self.metadata_url = self.config["metadata_url"]
+        self.records_url = self.config["records_url"]
+        self.token = self.config["token"]
+
+    def run_discovery(self, args):
         headers = {'Authorization': 'Bearer {}'.format(args.config['token'])}
         response = requests.get(url=args.config['metadata_url'] + args.config['base_id'], headers=headers)
         entries = []
@@ -40,8 +39,7 @@ class Airtable(object):
 
         return Catalog(entries).dump()
 
-    @classmethod
-    def run_sync(cls, config, properties):
+    def run_sync(self, config, properties):
 
         streams = properties['streams']
 
@@ -53,7 +51,7 @@ class Airtable(object):
             schema = stream['metadata']
 
             if table != 'relations' and schema['selected']:
-                response = Airtable.get_response(config['base_id'], schema["name"])
+                response = self.get_response(config['base_id'], schema["name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
                                                                response.json().get('records'),
@@ -65,7 +63,7 @@ class Airtable(object):
                     offset = response.json().get("offset")
 
                     while offset:
-                        response = Airtable.get_response(config['base_id'], schema["name"], offset)
+                        response = self.get_response(config['base_id'], schema["name"], offset)
                         if response.json().get('records'):
                             records = JsonUtils.match_record_with_keys(schema,
                                                                        response.json().get('records'),
@@ -82,15 +80,14 @@ class Airtable(object):
         singer.write_schema('relations', relations_table, 'id')
         singer.write_records('relations', Relations.get_records())
 
-    @classmethod
-    def get_response(cls, base_id, table, offset=None):
+    def get_response(self, base_id, table, offset=None):
 
-        headers = {'Authorization': 'Bearer {}'.format(cls.token)}
+        headers = {'Authorization': 'Bearer {}'.format(self.token)}
         table = table.replace('/', '%2F')
 
         if offset:
-            request = cls.records_url + base_id + '/' + table + '?offset={}'.format(offset)
+            request = self.records_url + base_id + '/' + table + '?offset={}'.format(offset)
         else:
-            request = cls.records_url + base_id + '/' + table
+            request = self.records_url + base_id + '/' + table
 
         return requests.get(url=request, headers=headers)
