@@ -25,7 +25,7 @@ class Airtable():
                     "name": table_name,
                     "properties": columns}
 
-            columns["id"] = {"type": ["null", "string"], 'key': True}
+            columns["record_id"] = {"type": ["null", "string"], 'key': True}
 
             for field in table["fields"]:
                 if not field["name"] == "Id":
@@ -57,7 +57,7 @@ class Airtable():
                                                                response.json().get('records'),
                                                                config['remove_emojis'])
 
-                    singer.write_schema(table, schema, 'id')
+                    singer.write_schema(table, schema, 'record_id')
                     singer.write_records(table, records)
 
                     offset = response.json().get("offset")
