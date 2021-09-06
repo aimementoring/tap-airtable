@@ -2,8 +2,7 @@ from tap_airtable.airtable_utils import JsonUtils, Relations
 import requests
 import json
 import singer
-from singer.catalog import Catalog, CatalogEntry
-
+from singer.catalog import Catalog, CatalogEntry, Schema
 
 class Airtable(object):
     with open('./config.json', 'r') as f:
@@ -22,9 +21,21 @@ class Airtable(object):
 
             columns = {}
             table_name = table["name"]
-            base = {"selected": args.config['selected_by_default'],
-                    "name": table_name,
-                    "properties": columns}
+
+            # Create schema
+            base = {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": columns
+            }
+
+            # Create metadata
+            metadata = [{
+                "breadcrumb": [],
+                "metadata": {
+                    "inclusion": "available"
+                }
+            }]
 
             columns["id"] = {"type": ["null", "string"], 'key': True}
 
@@ -32,13 +43,28 @@ class Airtable(object):
                 if not field["name"] == "Id":
                     columns[field["name"]] = {"type": ["null", "string"]}
 
+                metadata.append({
+                    'metadata': {
+                        'inclusion': 'available'
+                    },
+                    'breadcrumb': ['properties', field["name"]]
+                })
+
+            schema = Schema.from_dict(base)
+
             entry = CatalogEntry(
                 table=table_name,
                 stream=table_name,
-                metadata=base)
+                schema=schema,
+                metadata=metadata)
             entries.append(entry)
 
         return Catalog(entries).dump()
+
+    def is_selected(metadata):
+        mdata = singer.metadata.to_map(metadata)
+        root_metadata = mdata.get(())
+        return root_metadata and root_metadata.get('selected') is True
 
     @classmethod
     def run_sync(cls, config, properties):
@@ -50,10 +76,11 @@ class Airtable(object):
             table = table.replace(' ', '')
             table = table.replace('{', '')
             table = table.replace('}', '')
-            schema = stream['metadata']
+            schema = stream['schema']
+            metadata = stream['metadata']
 
-            if table != 'relations' and schema['selected']:
-                response = Airtable.get_response(config['base_id'], schema["name"])
+            if table != 'relations' and cls.is_selected(metadata):
+                response = Airtable.get_response(config['base_id'], stream["table_name"])
                 if response.json().get('records'):
                     records = JsonUtils.match_record_with_keys(schema,
                                                                response.json().get('records'),
@@ -65,7 +92,7 @@ class Airtable(object):
                     offset = response.json().get("offset")
 
                     while offset:
-                        response = Airtable.get_response(config['base_id'], schema["name"], offset)
+                        response = Airtable.get_response(config['base_id'], stream["table_name"], offset)
                         if response.json().get('records'):
                             records = JsonUtils.match_record_with_keys(schema,
                                                                        response.json().get('records'),
