@@ -48,7 +48,7 @@ class JsonUtils(object):
 
                 Relations.save_if_list_of_ids(record.get('fields').get(key), id)
 
-            record_to_dump['id'] = record.get('id')
+            record_to_dump['record_id'] = record.get('id')
 
             records_to_dump.append(record_to_dump)
 
