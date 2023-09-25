@@ -8,6 +8,7 @@ setup(name='tap-airtable',
       classifiers=['Programming Language :: Python :: 3 :: Only'],
       py_modules=['tap_airtable'],
       install_requires=[
+          'airtable-python==0.1.1',
           'backoff==1.3.2',
           'certifi==2018.11.29',
           'chardet==3.0.4',
@@ -17,12 +18,12 @@ setup(name='tap-airtable',
           'python-dateutil==2.7.5',
           'pytz==2018.4',
           'pytzdata==2018.7',
-          'requests==2.20.1',
+          'requests==2.26',
           'simplejson==3.11.1',
           'singer-python==5.4.0',
           'six==1.11.0',
           'tzlocal==1.5.1',
-          'urllib3==1.24.2'
+          'urllib3==1.24.2',
       ],
       entry_points='''
           [console_scripts]

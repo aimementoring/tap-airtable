@@ -5,7 +5,10 @@ from tap_airtable.services import Airtable
 REQUIRED_CONFIG_KEYS = [
     'metadata_url',
     'records_url',
-    'token',
+    'client_id',
+    'client_secret',
+    'access_token',
+    'refresh_token',
     'base_id',
     'selected_by_default',
     'remove_emojis'
@@ -14,11 +17,11 @@ REQUIRED_CONFIG_KEYS = [
 
 def main():
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
-
+    airtable = Airtable()
     if args.discover:
-        Airtable.run_discovery(args)
+        airtable.run_discovery(args)
     elif args.properties:
-        Airtable.run_sync(args.config, args.properties)
+        airtable.run_sync(args.config, args.properties)
 
 
 if __name__ == "__main__":
